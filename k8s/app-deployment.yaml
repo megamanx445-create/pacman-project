@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: pacman
-        image: 843282289076.dkr.ecr.us-east-2.amazonaws.com/pacman-repo:34af0f53752b7e52571443bcbb7e26d777821a2e
+        image: 843282289076.dkr.ecr.us-east-2.amazonaws.com/pacman-repo:46e6ea3b34b375a406a1252c8e400ba7887460ef
         imagePullPolicy: if-not-present
         ports:
         - containerPort: 8080
