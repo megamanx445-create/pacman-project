@@ -8,12 +8,8 @@ on:
 permissions:
   contents: read
   id-token: write
-
-env:
-  AWS_REGION: us-east-2
-  AWS_ACCOUNT_ID: 843282289076
-  ECR_REPOSITORY: pacman-repo
-  ECR_REGISTRY: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  
+  
 jobs:
   cicd:
     name: deploy using aws eks
@@ -26,9 +22,9 @@ jobs:
     - name: Configure temporary AWS credentials
       uses: aws-actions/configure-aws-credentials@v6.1.0
       with:
-        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-role
+        role-to-assume: arn:aws:iam::843282289076:role/github-actions-role
         role-session-name: github-actions-${{ github.run_id }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: us-east-2
 
     - name: Confirm aws credentials
       run: |
@@ -40,6 +36,8 @@ jobs:
 
     - name: Build, tag & push docker image
       env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} 
+          ECR_REPOSITORY: pacman-repo
           IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./docker
@@ -47,16 +45,14 @@ jobs:
     
     - name: Configure eks access
       run: |
-        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name Pacman-cluster
+        aws eks update-kubeconfig --region us-east-2 --name pacman-cluster
     
     - name: EKS deployment
       run: |
         kubectl apply -f ./k8s/storage-class.yaml
         kubectl apply -f ./k8s/db-sts.yaml
         kubectl apply -f ./k8s/app-deployment.yaml
-        kubectl set image deployment/pacman-app pacman=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/pacman-repo:${{ github.sha }}
+        kubectl set image deployment/pacman-app pacman=843282289076.dkr.ecr.us-east-2.amazonaws.com/pacman-repo:${{ github.sha }}
         kubectl rollout status deployment pacman-app
         kubectl rollout status statefulset mongo
         kubectl get services pacman-service
-
-     
