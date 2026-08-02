@@ -6,8 +6,8 @@ on:
       - master
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
   
   
 jobs:
@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v4            
       
     - name: Configure temporary AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v6.1.0
       with:
         role-to-assume: arn:aws:iam::843282289076:role/github-actions-role
         role-session-name: github-actions-${{ github.run_id }}
