@@ -1,10 +1,14 @@
 name: Main workflow
 
-#on:
-#  push:
-#    branches:
-#      - master
+on:
+  push:
+    branches:
+      - master
 
+permissions:
+  contents: read
+  id-token: write
+  
 jobs:
   cicd:
     name: deploy using aws eks
@@ -14,11 +18,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4            
       
-    - name: Configure AWS credentials
+    - name: Configure temporary AWS credentials
       uses: aws-actions/configure-aws-credentials@v6.1.0
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: arn:aws:iam::843282289076:role/github-action-role
+        role-session-name: github-actions-${{ github.run_id }}
         aws-region: us-east-2
 
     - name: Confirm aws credentials
