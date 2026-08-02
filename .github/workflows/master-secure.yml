@@ -12,7 +12,8 @@ permissions:
 env:
   AWS_REGION: us-east-2
   AWS_ACCOUNT_ID: 843282289076
-  
+  ECR_REPOSITORY: pacman-repo
+  ECR_REGISTRY: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 jobs:
   cicd:
     name: deploy using aws eks
@@ -39,8 +40,6 @@ jobs:
 
     - name: Build, tag & push docker image
       env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} 
-          ECR_REPOSITORY: pacman-repo
           IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./docker
